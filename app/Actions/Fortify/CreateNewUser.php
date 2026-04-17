@@ -30,7 +30,7 @@ class CreateNewUser implements CreatesNewUsers
         'phone' => ['nullable', 'string', 'max:20'],
         'organization_name' => ['nullable', 'string', 'max:255'],
         'organization_type' => ['nullable', 'string', 'max:255'],
-        'plan_id' => ['required', 'string', 'max:100'],
+        'plan_id' => ['nullable', 'string', 'max:100'],
         'member' => ['nullable', 'integer'],
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',

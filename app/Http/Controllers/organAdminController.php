@@ -419,74 +419,58 @@ return redirect()->back()->with('message', 'Member added successfully!'
 
     }
 
-    public function payment($plan_id)
+     public function payment($plan_id = null)
     {
         if(Auth::id()){
-            $plan = Plan::findOrFail($plan_id);
+            $plan = $plan_id ? Plan::findOrFail($plan_id) : null;
             $userID = Auth::user()->organization_name;
-            $payments = payment::where('organ_name', $userID)->get();
+            $payments = Payment::where('organ_name', $userID)->get();
             $useriD = Auth::user()->id;
             $users = User::where('id', $useriD)->get();
-            return view('organAdmin.payment', compact('users', 'payments'));
+            return view('organAdmin.payment', compact('users', 'payments', 'plan'));
         }else{
-
             return redirect()->back();
-         }
-
+        }
     }
 
 
     public function uploadpayment(Request $request)
 {
     $user = Auth::user();
-    $plan = Plan::findOrFail($request->plan_id);
 
     // Create new payment record
     $payment = new Payment();
     $payment->user_id = $user->id;
     $payment->name = $request->name;
     $payment->organ_name = $request->organ_name;
-    $payment->plan_id = $plan->id;
-    $payment->amount = $plan->price; // 💰 get amount directly from Plan
-    $payment->billing = $plan->billing_cycle; // ⏱️ get billing cycle from Plan
+    $payment->plan = $request->plan;
+    $payment->amount = $request->amount;
+    $payment->billing = $request->billing;
     $payment->payment_method = $request->payment_method;
 
-    // Simulate successful payment (replace with real gateway logic)
-    $paymentSuccess = true;
+    // OCR — read the uploaded payment screenshot
+    if ($request->hasFile('proof_of_payment')) {
+        $path = $request->file('proof_of_payment')->store('payment_proofs', 'public');
+        $payment->proof_of_payment = $path;
 
-    if ($paymentSuccess) {
-        // Calculate expiry date
-        if ($plan->billing_cycle === 'monthly') {
-            $expiry = now()->addMonth();
-        } elseif ($plan->billing_cycle === 'yearly') {
-            $expiry = now()->addYear();
-        } else {
-            $expiry = null; // Lifetime plan
-        }
+        $fullPath = \Illuminate\Support\Facades\Storage::disk('public')->path($path);
+        $ocrService = new \App\Services\OcrService();
+        $extracted = $ocrService->processPaymentScreenshot($fullPath);
 
-        // Update user plan and expiry
-        $user->update([
-            'plan_id' => $plan->id,
-            'plan_expiry' => $expiry,
-        ]);
-
-        // Save payment
-        $payment->status = 'success';
-        $payment->save();
-
-        return redirect()
-            ->route('organAdmin.plans.upgrade')
-            ->with('message', 'Plan upgraded successfully!');
-    } else {
-        $payment->status = 'failed';
-        $payment->save();
-
-        return redirect()
-            ->back()
-            ->with('error', 'Payment failed. Please try again.');
+        $payment->extracted_transaction_id = $extracted['transaction_id'];
+        $payment->extracted_amount         = $extracted['amount'];
+        $payment->extracted_date           = $extracted['date'];
+        $payment->raw_ocr_text             = $extracted['raw_text'];
     }
 
-    }
+    $payment->status = 'success';
+    $payment->save();
+
+    return redirect()
+        ->back()
+        ->with('message', 'Payment recorded successfully!');
+}
+        
 
 
 

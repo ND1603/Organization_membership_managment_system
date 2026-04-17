@@ -9,19 +9,7 @@ use App\Http\Controllers\PlanController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PaymentController;
 
-
-
 use App\Http\Controllers\Auth\GoogleController;
-
-
-
-
-
-
-
-/**Route::get('/', function () {
-    return view('welcome');
-});*/
 
 Route::get('/', [HomeController::class, 'index']);
 
@@ -31,22 +19,10 @@ Route::get('/events', [HomeController::class, 'event'])->name('guest.events');
 Route::get('/blogs', [HomeController::class, 'blog'])->name('guest.blogs');
 Route::get('/contact', [HomeController::class, 'contact'])->name('guest.contact');
 
-
-
-
-
-
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.login');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 
-
-
-
 Route::get('/home', [HomeController::class, 'redirect'])->middleware('auth', 'verified');
-
-
-
-
 
 Route::middleware([
     'auth:sanctum',
@@ -56,7 +32,29 @@ Route::middleware([
    Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+    
+Route::middleware(['auth'])->group(function () {
+    Route::get('/payment/verify', [App\Http\Controllers\PaymentVerificationController::class, 'create'])
+        ->name('payment-verification.create');
+    Route::post('/payment/verify', [App\Http\Controllers\PaymentVerificationController::class, 'store'])
+        ->name('payment-verification.store');
+    Route::get('/payment/verify/{paymentVerification}', [App\Http\Controllers\PaymentVerificationController::class, 'show'])
+        ->name('payment-verification.show');
 });
+
+    Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/payments', [App\Http\Controllers\PaymentVerificationController::class, 'adminIndex'])
+        ->name('admin.payments.index');
+    Route::post('/payments/{paymentVerification}/approve', [App\Http\Controllers\PaymentVerificationController::class, 'approve'])
+        ->name('admin.payments.approve');
+    Route::post('/payments/{paymentVerification}/reject', [App\Http\Controllers\PaymentVerificationController::class, 'reject'])
+        ->name('admin.payments.reject');
+});
+});
+
+// Payment Routes
+Route::get('/payment', [organAdminController::class, 'payment'])->name('payment');
+Route::get('/payment/{plan_id}', [organAdminController::class, 'payment']);
 
 Route::get('/organ', [AdminController::class, 'organ']);
 Route::get('/orgAdmin', [AdminController::class, 'orgAdmin']);
@@ -71,30 +69,29 @@ Route::get('/editorgan/{id}', [AdminController::class, 'editorgan']);
 Route::post('/updateorgan/{id}', [AdminController::class, 'updateorgan']);
 Route::get('/deleteorgan/{id}', [AdminController::class, 'deleteorgan']);
 
+Route::post('/uploadpayment', [organAdminController::class, 'uploadpayment'])
+    ->middleware('auth')
+    ->name('uploadpayment');
+
 Route::get('/editmembers/{id}', [AdminController::class, 'editmembers']);
 Route::post('/updatemember/{id}', [AdminController::class, 'updatemember']);
 Route::get('/deletemembers/{id}', [AdminController::class, 'deletemembers']);
 
-
-
 Route::get('/member1', [organAdminController::class, 'member']);
 Route::get('/event', [organAdminController::class, 'event']);
 Route::get('/blog', [organAdminController::class, 'blog']);
-Route::get('/payment/{plan_id}', [organAdminController::class, 'payment']);
- Route::get('/upgrade', [PlanController::class, 'ShowUpgradePlan'])->name('organAdmin.plans.upgrade');
-  Route::post('/upgrade', [PlanController::class, 'UpgradePlan']);
+Route::get('/upgrade', [PlanController::class, 'ShowUpgradePlan'])->name('organAdmin.plans.upgrade');
+Route::post('/upgrade', [PlanController::class, 'UpgradePlan']);
 
 Route::get('/sidebar nav', [organAdminController::class, 'sidebar']);
 Route::get('/edit_profile/{id}', [organAdminController::class, 'editprofile']);
 Route::post('/updateprofile/{id}', [organAdminController::class, 'updateprofile']);
-
 
 Route::get('/addmember', [organAdminController::class, 'addmember']);
 Route::post('/upload_member', [organAdminController::class, 'upload']);
 Route::get('/edit/{id}', [organAdminController::class, 'edit']);
 Route::post('/editmember/{id}', [organAdminController::class, 'editmember']);
 Route::get('/deletemember/{id}', [organAdminController::class, 'deletemember']);
-
 
 Route::post('/uploadevent', [organAdminController::class, 'uploadevent']);
 Route::get('/editevent/{id}', [organAdminController::class, 'editevent']);
@@ -106,17 +103,6 @@ Route::get('/editblog/{id}', [organAdminController::class, 'editblog']);
 Route::post('/updateblog/{id}', [organAdminController::class, 'updateblog']);
 Route::get('/deleteblog/{id}', [organAdminController::class, 'deleteblog']);
 
-Route::post('/uploadpayment', [organAdminController::class, 'uploadpayment']);
-
-
 Route::get('/sidebar', [MemberController::class, 'sidebar1']);
-
 Route::get('/event1', [MemberController::class, 'event12']);
-
 Route::get('/profile', [MemberController::class, 'profile']);
-
-
-
-
-
-

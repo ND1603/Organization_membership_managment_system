@@ -261,7 +261,10 @@
                                 </select>
                             </div>
 
-
+                        <div class="form-group">
+    <label for="paymentProof">Payment Proof</label>
+    <input type="file" id="paymentProof" name="proof_of_payment" class="form-control" accept="image/*" required>
+</div>
 
 
                     <div class="modal-footer">
