@@ -11,6 +11,13 @@ use App\Http\Controllers\PaymentController;
 
 use App\Http\Controllers\Auth\GoogleController;
 
+use App\Http\Controllers\Auth\OtpController;
+
+
+Route::get('/verify-otp',  [OtpController::class, 'show'])->name('otp.show');
+Route::post('/verify-otp', [OtpController::class, 'verify'])->name('otp.verify');
+Route::post('/resend-otp', [OtpController::class, 'resend'])->name('otp.resend');
+
 Route::get('/', [HomeController::class, 'index']);
 
 Route::get('/about', [HomeController::class, 'about'])->name('guest.about');
