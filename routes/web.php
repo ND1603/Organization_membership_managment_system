@@ -56,7 +56,12 @@ Route::middleware(['auth'])->group(function () {
         ->name('admin.payments.approve');
     Route::post('/payments/{paymentVerification}/reject', [App\Http\Controllers\PaymentVerificationController::class, 'reject'])
         ->name('admin.payments.reject');
-});
+
+     Route::get('/custom-attributes',                    [App\Http\Controllers\Admin\CustomAttributeController::class, 'index'])->name('admin.custom-attributes.index');
+    Route::post('/custom-attributes',                   [App\Http\Controllers\Admin\CustomAttributeController::class, 'store'])->name('admin.custom-attributes.store');
+    Route::post('/custom-attributes/{customAttribute}/toggle',  [App\Http\Controllers\Admin\CustomAttributeController::class, 'toggle'])->name('admin.custom-attributes.toggle');
+    Route::delete('/custom-attributes/{customAttribute}',       [App\Http\Controllers\Admin\CustomAttributeController::class, 'destroy'])->name('admin.custom-attributes.destroy');
+    });    
 });
 
 // Payment Routes
