@@ -218,6 +218,79 @@
         <label for="file">Photo</label>
         <input type="file" id="file" name="file" class="form-control">
     </div>
+    
+    {{-- Custom Attribute Fields --}}
+{{-- These are dynamically added by the admin from the custom attributes settings page --}}
+@if(isset($customAttributes) && $customAttributes->count() > 0)
+    <div class="form-group">
+        <hr>
+        <h5 style="margin-bottom: 15px; color: #555;">Additional Information</h5>
+    </div>
+
+    @foreach($customAttributes as $definition)
+        <div class="form-group">
+            <label for="attr_{{ $definition->name }}">
+                {{ $definition->label }}
+                @if($definition->is_required)
+                    <span style="color: red;">*</span>
+                @endif
+            </label>
+
+            @if($definition->type === 'select')
+                <select
+                    name="attr_{{ $definition->name }}"
+                    id="attr_{{ $definition->name }}"
+                    class="form-control"
+                    {{ $definition->is_required ? 'required' : '' }}
+                >
+                    <option value="">-- Select --</option>
+                    @foreach($definition->options as $option)
+                        <option value="{{ $option }}">{{ $option }}</option>
+                    @endforeach
+                </select>
+
+            @elseif($definition->type === 'boolean')
+                <select
+                    name="attr_{{ $definition->name }}"
+                    id="attr_{{ $definition->name }}"
+                    class="form-control"
+                    {{ $definition->is_required ? 'required' : '' }}
+                >
+                    <option value="">-- Select --</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+
+            @elseif($definition->type === 'date')
+                <input
+                    type="date"
+                    name="attr_{{ $definition->name }}"
+                    id="attr_{{ $definition->name }}"
+                    class="form-control"
+                    {{ $definition->is_required ? 'required' : '' }}
+                >
+
+            @elseif($definition->type === 'number')
+                <input
+                    type="number"
+                    name="attr_{{ $definition->name }}"
+                    id="attr_{{ $definition->name }}"
+                    class="form-control"
+                    {{ $definition->is_required ? 'required' : '' }}
+                >
+
+            @else
+                <input
+                    type="text"
+                    name="attr_{{ $definition->name }}"
+                    id="attr_{{ $definition->name }}"
+                    class="form-control"
+                    {{ $definition->is_required ? 'required' : '' }}
+                >
+            @endif
+        </div>
+    @endforeach
+@endif
 
     <!-- Send Invitation Checkbox -->
     <div class="form-group form-check">

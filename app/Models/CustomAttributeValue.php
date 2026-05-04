@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class CustomAttributeValue extends Model
 {
     protected $fillable = [
-        'member_id',
+        'user_id',
         'custom_attribute_definition_id',
         'value',
     ];
@@ -21,9 +21,9 @@ class CustomAttributeValue extends Model
         );
     }
 
-    // Which member this value belongs to
-    public function member()
+    // Which user this value belongs to
+    public function user()
     {
-        return $this->belongsTo(Member::class);
+        return $this->belongsTo(User::class);
     }
 }

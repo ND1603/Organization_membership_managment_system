@@ -91,7 +91,13 @@ class organAdminController extends Controller
         if(Auth::id()){
             $useriD = Auth::user()->id;
             $users = User::where('id', $useriD)->get();
-            return view('organAdmin.addmember', compact('users'));
+
+            // Pass active custom fields to the form
+            $customAttributes = \App\Models\CustomAttributeDefinition::where('is_active', true)
+              ->orderBy('sort_order')
+              ->get();
+
+            return view('organAdmin.addmember', compact('users', 'customAttributes'));
         }else{
 
             return redirect()->back();
@@ -152,6 +158,18 @@ class organAdminController extends Controller
 
 public function upload(Request $request)
 {
+    $request->validate([
+        'name'                  => 'required|string|max:255',
+        'organization_name'     => 'nullable|string|max:255',
+        'email'                 => 'required|email|unique:users,email',
+        'phone'                 => 'nullable|string|max:20',
+        'address'               => 'nullable|string|max:500',
+        'sex'                   => 'nullable|in:male,female,other',
+        'join_date'             => 'nullable|date',
+        'password'              => 'required|string|min:8|confirmed',
+        'photo'                 => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
+
     $photoName = null;
     if ($request->hasFile('photo')) {
         $image = $request->file('photo');
@@ -161,8 +179,7 @@ public function upload(Request $request)
 
 $org =Auth::user() ;
 $currentMembers = User::where('organization_name', $org->organization_name)->where('role', 'member')->count();
- if ($currentMembers >= $org->plan->max_members) {
-
+ if ($org->plan->max_members && $currentMembers >= $org->plan->max_members) {
     return back()->with([
     'message' => 'You reached your member limit. Upgrade your plan!',
     'alert_type' => 'error'
@@ -189,29 +206,32 @@ $currentMembers = User::where('organization_name', $org->organization_name)->whe
         'photo' => $photoName,
     ]);
 
-
-
-       $request->validate([
-
-        'name' => 'required|string|max:255',
-        'organ_name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email',
-        'phone' => 'nullable|string|max:20',
-        'address' => 'nullable|string|max:500',
-        'sex' => 'nullable|in:male,female,other',
-        'join_date' => 'nullable|date',
-        'password' => 'required|string|min:8|confirmed', // needs password_confirmation
-        'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-
-        // other validations...
-    ]);
-
     //$member->save();
 
-return redirect()->back()->with('message', 'Member added successfully!'
-        );
+// Save custom attribute values for this new member
+    $customAttributes = \App\Models\CustomAttributeDefinition::where('is_active', true)->get();
+
+    foreach ($customAttributes as $definition) {
+        $key   = 'attr_' . $definition->name;
+        $value = $request->input($key);
+
+         // TEMPORARY DEBUG — remove after testing
+    \Illuminate\Support\Facades\Log::info('Custom attr check', [
+        'key'   => $key,
+        'value' => $value,
+    ]);
+
+        if ($value !== null && $value !== '') {
+            \App\Models\CustomAttributeValue::create([
+                'user_id'                        => $member->id,
+                'custom_attribute_definition_id' => $definition->id,
+                'value'                          => $value,
+            ]);
+        }
     }
 
+    return redirect()->back()->with('message', 'Member added successfully!');
+}
 
 
     public function event()

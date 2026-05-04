@@ -51,7 +51,23 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $hidden = [
+      // Custom attribute values for this user
+public function customAttributes()
+{
+    return $this->hasMany(CustomAttributeValue::class);
+}
+
+// Helper — get a single custom attribute value by field name
+// Usage: $user->getCustomAttribute('department')
+public function getCustomAttribute(string $name): ?string
+{
+    return $this->customAttributes
+        ->first(fn($v) => $v->definition->name === $name)
+        ?->value;
+}
+
+protected $hidden = [    
+
         'password',
         'remember_token',
         'two_factor_recovery_codes',
