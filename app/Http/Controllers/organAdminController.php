@@ -215,11 +215,7 @@ $currentMembers = User::where('organization_name', $org->organization_name)->whe
         $key   = 'attr_' . $definition->name;
         $value = $request->input($key);
 
-         // TEMPORARY DEBUG — remove after testing
-    \Illuminate\Support\Facades\Log::info('Custom attr check', [
-        'key'   => $key,
-        'value' => $value,
-    ]);
+         
 
         if ($value !== null && $value !== '') {
             \App\Models\CustomAttributeValue::create([
