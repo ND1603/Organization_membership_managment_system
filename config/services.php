@@ -40,6 +40,14 @@ return [
     'client_secret' => env('GOOGLE_CLIENT_SECRET'),
     'redirect' => env('GOOGLE_REDIRECT_URI'),
 ],
-
+    'telebirr' => [
+    'app_id'      => env('TELEBIRR_APP_ID'),
+    'app_key'     => env('TELEBIRR_APP_KEY'),
+    'short_code'  => env('TELEBIRR_SHORT_CODE'),
+    'public_key'  => env('TELEBIRR_PUBLIC_KEY'),
+    'base_url'    => env('TELEBIRR_BASE_URL'),
+    'notify_url'  => env('TELEBIRR_NOTIFY_URL'),
+    'return_url'  => env('TELEBIRR_RETURN_URL'),
+],
 
 ];

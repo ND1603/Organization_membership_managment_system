@@ -13,6 +13,24 @@ use App\Http\Controllers\Auth\GoogleController;
 
 use App\Http\Controllers\Auth\OtpController;
 
+use App\Http\Controllers\TelebirrController;
+
+// Telebirr notify — must be CSRF exempt (Telebirr calls this server-to-server)
+Route::post('/telebirr/notify', [TelebirrController::class, 'notify'])->name('telebirr.notify');
+
+// Telebirr return URL — no auth needed as Telebirr redirects here
+Route::get('/telebirr/return', [TelebirrController::class, 'returnUrl'])->name('telebirr.return');
+
+// Mock pages — local testing only
+Route::get('/telebirr/mock', [TelebirrController::class, 'mockPage'])->name('telebirr.mock');
+Route::post('/telebirr/mock-pay', [TelebirrController::class, 'mockPay'])->name('telebirr.mock.pay');
+
+// Authenticated routes
+Route::middleware('auth')->group(function () {
+    Route::get('/telebirr/pay',  [TelebirrController::class, 'create'])->name('telebirr.create');
+    Route::post('/telebirr/pay', [TelebirrController::class, 'initiate'])->name('telebirr.initiate');
+});
+
 
 Route::get('/verify-otp',  [OtpController::class, 'show'])->name('otp.show');
 Route::post('/verify-otp', [OtpController::class, 'verify'])->name('otp.verify');
