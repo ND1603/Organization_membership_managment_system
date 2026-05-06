@@ -1,4 +1,4 @@
-@extends('layouts.app')
+<x-app-layout>
 
 @section('content')
 <div class="container mx-auto px-4 py-8 max-w-2xl">
@@ -130,4 +130,4 @@ function clearImage() {
     document.getElementById('preview-area').classList.add('hidden');
 }
 </script>
-@endsection
+</x-app-layout>

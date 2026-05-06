@@ -74,6 +74,7 @@ Route::post('/orgadmin_upload', [AdminController::class, 'orgadmin_upload']);
 Route::get('/members', [AdminController::class, 'members']);
 Route::get('/organadmin', [AdminController::class, 'organadmin']);
 Route::get('/payments', [AdminController::class, 'payments']);
+Route::get('/payments/{paymentVerification}/invoice', [App\Http\Controllers\PaymentVerificationController::class, 'downloadInvoice'])->name('admin.payments.invoice');
 
 Route::get('/addorgan', [AdminController::class, 'muaz']);
 Route::post('/uploadorgan', [AdminController::class, 'uploadorgan']);
@@ -118,3 +119,4 @@ Route::get('/deleteblog/{id}', [organAdminController::class, 'deleteblog']);
 Route::get('/sidebar', [MemberController::class, 'sidebar1']);
 Route::get('/event1', [MemberController::class, 'event12']);
 Route::get('/profile', [MemberController::class, 'profile']);
+Route::middleware('auth')->get('/my-payments/{paymentVerification}/invoice', [App\Http\Controllers\PaymentVerificationController::class, 'downloadInvoice'])->name('payments.invoice.download');

@@ -19,6 +19,9 @@ class PaymentVerification extends Model
         'admin_note',
         'verified_by',
         'verified_at',
+        'invoice_number',
+        'invoice_path',
+
     ];
 
     // Cast date field automatically

@@ -1,6 +1,6 @@
-@extends('layouts.app')
+<x-app-layout>
 
-@section('content')
+
 <div class="container mx-auto px-4 py-8 max-w-2xl">
 
     <h1 class="text-2xl font-bold mb-6">Payment Verification Status</h1>
@@ -66,4 +66,4 @@
     </a>
 
 </div>
-@endsection
+</x-app-layout>

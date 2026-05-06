@@ -1,6 +1,6 @@
-@extends('layouts.app')
+<x-app-layout>
 
-@section('content')
+
 <div class="container mx-auto px-4 py-8">
 
     <h1 class="text-2xl font-bold mb-6">Payment Verifications</h1>
@@ -53,7 +53,14 @@
                             {{ ucfirst($v->status) }}
                         </span>
                     </td>
-                    <td class="px-4 py-3">
+                   <td class="px-4 py-3">
+                        {{-- Download invoice if approved --}}
+                        @if($v->invoice_path)
+                            <a href="{{ route('admin.payments.invoice', $v) }}"
+                               class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 inline-block mb-2">
+                                Download Invoice
+                            </a>
+                        @endif
                         @if($v->isPending())
                         <div class="flex gap-2">
                             {{-- Approve button --}}
@@ -63,6 +70,8 @@
                                     Approve
                                 </button>
                             </form>
+
+                           
 
                             {{-- Reject with note --}}
                             <button onclick="showRejectForm({{ $v->id }})"
@@ -108,4 +117,4 @@ function showRejectForm(id) {
     document.getElementById('reject-form-' + id).classList.toggle('hidden');
 }
 </script>
-@endsection
+</x-app-layout>

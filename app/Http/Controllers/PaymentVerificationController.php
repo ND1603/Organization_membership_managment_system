@@ -7,6 +7,7 @@ use App\Services\OcrService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PaymentVerificationController extends Controller
 {
@@ -105,15 +106,52 @@ class PaymentVerificationController extends Controller
      * Admin: approve a payment
      */
     public function approve(PaymentVerification $paymentVerification)
-    {
-        $paymentVerification->update([
-            'status'      => 'approved',
-            'verified_by' => Auth::id(),
-            'verified_at' => now(),
-        ]);
+{
+    // Generate a unique invoice number
+    $invoiceNumber = 'INV-' . now()->format('Y') . '-' . str_pad($paymentVerification->id, 5, '0', STR_PAD_LEFT);
 
-        return back()->with('success', 'Payment approved successfully.');
+    // Generate the PDF invoice
+    $pdf = Pdf::loadView('payment_verification.invoice', [
+        'verification' => $paymentVerification,
+        'invoiceNumber' => $invoiceNumber,
+    ]);
+
+    // Store the PDF in storage/app/private/invoices/
+    $invoicePath = 'invoices/' . $invoiceNumber . '.pdf';
+    Storage::disk('local')->put($invoicePath, $pdf->output());
+
+    // Update the payment record
+    $paymentVerification->update([
+        'status'         => 'approved',
+        'verified_by'    => Auth::id(),
+        'verified_at'    => now(),
+        'invoice_number' => $invoiceNumber,
+        'invoice_path'   => $invoicePath,
+    ]);
+
+    return back()->with('success', 'Payment approved. Invoice ' . $invoiceNumber . ' generated.');
+}
+
+    /**
+ * Download the invoice PDF for an approved payment.
+ */
+public function downloadInvoice(PaymentVerification $paymentVerification)
+{
+    // Only the member who owns it or an admin can download
+    if ($paymentVerification->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        abort(403, 'Unauthorized');
     }
+
+    if (!$paymentVerification->invoice_path || !Storage::disk('local')->exists($paymentVerification->invoice_path)) {
+        return back()->with('error', 'Invoice not found.');
+    }
+
+    return Storage::disk('local')->download(
+        $paymentVerification->invoice_path,
+        $paymentVerification->invoice_number . '.pdf'
+    );
+}   
+
 
     /**
      * Admin: reject a payment
