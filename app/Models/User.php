@@ -44,6 +44,9 @@ class User extends Authenticatable
         'plan_expiry',
 
         'google_id',
+        'fayda_fin', 
+        'fayda_verified',
+        'fayda_verified_at',
     ];
 
     /**
@@ -93,6 +96,10 @@ protected $hidden = [
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'fayda_verified'     => 'boolean',
+            'fayda_verified_at'  => 'datetime',
+            'phone_verified'     => 'boolean',
+            'phone_verified_at'  => 'datetime',
         ];
     }
 

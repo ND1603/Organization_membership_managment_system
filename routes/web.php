@@ -25,6 +25,20 @@ Route::get('/telebirr/return', [TelebirrController::class, 'returnUrl'])->name('
 Route::get('/telebirr/mock', [TelebirrController::class, 'mockPage'])->name('telebirr.mock');
 Route::post('/telebirr/mock-pay', [TelebirrController::class, 'mockPay'])->name('telebirr.mock.pay');
 
+use App\Http\Controllers\FaydaController;
+
+// Fayda ID verification routes
+Route::middleware('auth')->group(function () {
+    Route::get('/fayda',          [FaydaController::class, 'status'])->name('fayda.status');
+    Route::get('/fayda/redirect', [FaydaController::class, 'redirect'])->name('fayda.redirect');
+    Route::get('/fayda/callback', [FaydaController::class, 'callback'])->name('fayda.callback');
+});
+
+// Mock Fayda login page — no auth needed
+Route::get('/fayda/mock',       [FaydaController::class, 'mockPage'])->name('fayda.mock');
+Route::post('/fayda/mock-login',[FaydaController::class, 'mockLogin'])->name('fayda.mock.login');
+
+
 // Authenticated routes
 Route::middleware('auth')->group(function () {
     Route::get('/telebirr/pay',  [TelebirrController::class, 'create'])->name('telebirr.create');

@@ -49,5 +49,13 @@ return [
     'notify_url'  => env('TELEBIRR_NOTIFY_URL'),
     'return_url'  => env('TELEBIRR_RETURN_URL'),
 ],
+    
+    'fayda' => [
+    'client_id'     => env('FAYDA_CLIENT_ID'),
+    'client_secret' => env('FAYDA_CLIENT_SECRET'),
+    'redirect_uri'  => env('FAYDA_REDIRECT_URI'),
+    'base_url'      => env('FAYDA_BASE_URL'),
+],
+    
 
 ];
